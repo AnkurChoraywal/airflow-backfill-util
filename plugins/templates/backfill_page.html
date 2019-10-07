@@ -1,114 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Airflow - Backfill Utility</title>
-    <link rel="icon" type="image/png" href="/static/pin_30.png">
+{% extends 'admin/master.html' %}
+{% block tail %}
 
-    <!-- bootstrap 4 deps-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-
-    <!-- datepicker deps for bootstrap 4-->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
-
-
-    <script>
+<script>
     $(document).ready(function(){
 
-        var source = null;
+        const source = null;
 
-        var backfill_success_message = '<div class="alert alert-success alert-dismissible">'+
+        const backfill_success_message = '<div class="alert alert-success alert-dismissible">'+
                                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+
                                        '<strong>&#128077;</strong> Backfill has been completed successfully'+
                                        '</div>';
-        var cleared_success_message = '<div class="alert alert-success alert-dismissible">'+
+        const cleared_success_message = '<div class="alert alert-success alert-dismissible">'+
                                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+
                                        '<strong>&#128077;</strong> Dag runs have been cleared successfully'+
                                        '</div>';
-        var backfill_error_message = '<div class="alert alert-danger alert-dismissible fade show">'+
+        const backfill_error_message = '<div class="alert alert-danger alert-dismissible fade show">'+
                                      '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+
                                      '<strong>&#128078;</strong> Something went wrong !'+
                                      '</div>';
 
-        var background_success_message = '<div class="alert alert-success alert-dismissible">'+
+        const background_success_message = '<div class="alert alert-success alert-dismissible">'+
                                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+
                                        '<strong>&#128077;</strong> Background job submitted'+
                                        '</div>';
-        var stream_stopped_message = '<div class="alert alert-info alert-dismissible">'+
+        const stream_stopped_message = '<div class="alert alert-info alert-dismissible">'+
                                         '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+
                                         '<strong>&#128517;</strong> Streaming has been stopped'+
-                                      '</div>'
+                                      '</div>';
 
-        var spinner_backfill_message = '<span class="spinner-border text-primary" style="height: 20px; width:20px;"></span>&nbsp;&nbsp;<strong>Executing </strong><span id="stop_process" style="margin-left:10px; color:blue; text-decoration: underline; cursor: pointer;">Stop Streaming</span>'
+        const spinner_backfill_message = '<span class="spinner-border text-primary" style="height: 20px; width:20px;"></span>&nbsp;&nbsp;<strong>Executing </strong><span id="stop_process" style="margin-left:10px; color:blue; text-decoration: underline; cursor: pointer;">Stop Streaming</span>';
 
-        var spinner_background_message = '<span class="spinner-border text-primary" style="height: 20px; width:20px;"></span>&nbsp;&nbsp;<strong>Submitting background task</strong>'
+        const spinner_background_message = '<span class="spinner-border text-primary" style="height: 20px; width:20px;"></span>&nbsp;&nbsp;<strong>Submitting background task</strong>';
 
-        var backfill_done = function(){
+        const backfill_done = function(){
             $("#backfill_status").html(backfill_success_message)
         };
-        var backfill_err = function(){
+
+        const backfill_err = function(){
             $("#backfill_status").html(backfill_error_message)
         };
-        var backfill_progress = function(){
+
+        const backfill_progress = function(){
             $("#backfill_status").html(spinner_backfill_message)
-        }
-        var clear_done = function(){
+        };
+
+        const clear_done = function(){
             $("#backfill_status").html(cleared_success_message)
-        }
+        };
 
-        var background_progress = function(){
+        const background_progress = function(){
             $("#backfill_status").html(spinner_background_message)
-        }
-        var background_done = function(){
+        };
+
+        const background_done = function(){
             $("#backfill_status").html(background_success_message)
-        }
+        };
 
-        var disable_form = function(){
+        const disable_form = function(){
             $("#form :input").prop("disabled", true);
-        }
+        };
 
-        var enable_form = function(){
+        const enable_form = function(){
             $("#form :input").prop("disabled", false);
-        }
+        };
 
-        var stream_stopped = function(){
+        const stream_stopped = function(){
             $("#backfill_status").html(stream_stopped_message)
-        }
+        };
 
-        $("#form").submit(function(event){            
+        $(document).on("submit", "#form", function(event){
 
             event.preventDefault();
 
-            var dag_name = $("#dag_name").val();
-            var start_date = moment($("#start_date").val()).format('YYYY-MM-DDTHH:mm:00');
-            var end_date = moment($("#end_date").val()).format('YYYY-MM-DDTHH:mm:00');
+            const dag_name = $("#dag_name").val();
+            console.log(dag_name);
+            const start_date = moment($("#start_date").val()).format('YYYY-MM-DDTHH:mm:00');
+            const end_date = moment($("#end_date").val()).format('YYYY-MM-DDTHH:mm:00');
 
-            var background = $("#background").prop("checked");
-            var clear_prev = $("#clear_prev").prop("checked");
+            const background = $("#background").prop("checked");
+            const clear_prev = $("#clear_prev").prop("checked");
 
-            var query_string = "?dag_name=" + dag_name +
+            const query_string = "?dag_name=" + dag_name +
                                "&start_date=" + start_date +
                                "&end_date=" + end_date +
                                "&clear="+clear_prev;
 
-            var st_date = moment($("#start_date").val())
-            var en_date = moment($("#end_date").val())
+            const st_date = moment($("#start_date").val());
+            const en_date = moment($("#end_date").val());
 
-            if(st_date > en_date){        
-                alert('Start date should be less than end date ')
+            if(st_date > en_date){
+                alert('Start date should be less than end date ');
                 return false;
             }
             if(en_date > st_date && en_date.diff(st_date, 'days') > 7){
-                alert('Difference between start and end date should not exceed 7 days')
+                alert('Difference between start and end date should not exceed 7 days');
                 return false;
             }
 
@@ -116,83 +101,83 @@
             disable_form()
 
 
-            if(background==false){
-                
+            if(background===false){
+
                 url = '/admin/backfill/stream'+query_string;
 
                 document.getElementById("output").innerHTML = '';
 
                 // start streaming
-                source = new EventSource(url);
+                let source = new EventSource(url);
 
                 // show spinner for backfill in progress
-                var show_spinner = 0;
+                const show_spinner = 0;
 
                 source.onmessage = function(event) {
 
                     // show spinner
-                    if(show_spinner == 0){
-                        backfill_progress()
-                        show_spinner = 1;
+                    if(show_spinner === 0){
+                        backfill_progress();
+                        const show_spinner = 1;
                     }
 
-                    if (event.data.indexOf('Backfill done. Exiting.') != -1){
-                        $("#output").prepend(event.data+"<br>")
-                        source.close()
-                        backfill_done()
+                    if (event.data.indexOf('Backfill done. Exiting.') !== -1){
+                        $("#output").prepend(event.data+"<br>");
+                        source.close();
+                        backfill_done();
                         enable_form()
                     }
                     else if(event.data.indexOf('dag_id could not be found') >= 0){
-                        $("#output").prepend(event.data+"<br>")
-                        source.close()
-                        backfill_err()
+                        $("#output").prepend(event.data+"<br>");
+                        source.close();
+                        backfill_err();
                         enable_form()
                     }
                     else if(event.data.indexOf('Clear Done') >= 0){
-                        $("#output").prepend(event.data+"<br>")
-                        source.close()
-                        clear_done()
+                        $("#output").prepend(event.data+"<br>");
+                        source.close();
+                        clear_done();
                         enable_form()
                     }
                     else if(event.data.indexOf('Nothing to clear') >= 0){
-                        $("#output").prepend(event.data+"<br>")
-                        source.close()
-                        clear_done()
+                        $("#output").prepend(event.data+"<br>");
+                        source.close();
+                        clear_done();
                         enable_form()
                     }
                     else{
                         $("#output").prepend(event.data+"<br>")
-                    } 
+                    }
                 }
             }
             else {
-                user_accepted = confirm("You have selected background backfill for DAG name '"+dag_name+"'. Please click OK if DAG name is correct.")
+                user_accepted = confirm("You have selected background backfill for DAG name '"+dag_name+"'. Please click OK if DAG name is correct.");
 
-                if (user_accepted == true){
-                    url = '/admin/backfill/background'+query_string
+                if (user_accepted === true){
+                    url = '/admin/backfill/background'+query_string;
 
                     // show background progress message
-                    background_progress()
+                    background_progress();
 
                     $.get(url, function(data){
 
-                        document.getElementById("output").innerHTML = '<center>Your background job has been submitted successfully !</center>'
+                        document.getElementById("output").innerHTML = 'Your background job has been submitted successfully!';
 
                         // show background submission task message
-                        background_done()
+                        background_done();
 
                         // enable the form
                         enable_form()
 
                     })
                 }else{
-                    // enable the form 
+                    // enable the form
                     enable_form()
                 }
-                
 
 
-            }            
+
+            }
 
         });
 
@@ -200,59 +185,40 @@
 
         $("#history_load").click(function(){
 
-            $("#history").html('Fetching history...')
+            $("#history").html('Fetching history...');
 
             $.get('/admin/backfill/history', function(data){
 
                 if(data != null){
-                    data_rows = data.split('\n')
-                    
-                    var rows = [];
+                    let data_rows = data.split('\n');
+
+                    let rows = [];
 
                     for(var x=0; x < data_rows.length - 1; x++){
-                        row = data_rows[x].split(',')
-
-                        var time = moment(row[1]).format('YYYY-MM-DD HH:mm:SS')
-                        var r = '<div style="margin-top: 10px; border-bottom: 1px solid #f1f1f1; padding-bottom: 10px;">'+row[0]+'<span class="far fa-clock" style="float:right; font-size: 12px; color: #565656;">&nbsp;&nbsp;'+time+'</span>'+'</div>'
+                        let row = data_rows[x].split(',');
+                        let time = moment(row[1]).format('YYYY-MM-DD HH:mm:SS');
+                        let r = '<div style="margin-top:10px;border-bottom:1px solid #f1f1f1; padding-bottom: 10px;">'+row[0]+'<span class="far fa-clock" style="float:right; font-size: 12px; color: #565656;">&nbsp;&nbsp;'+time+'</span>'+'</div>';
 
                         rows.push(r)
 
                     }
 
-                    var rev_array = rows.reverse().join('')
+                    let rev_array = rows.reverse().join('');
 
                     $("#history").html(rev_array)
                 }else{
                     $("#history").html('Something went wrong!')
                 }
-                
-            }) 
 
-        })
-        
+            })
 
-        // UPDATING SCROLL OF OUTPUT
-        // function updateScroll(){
-        //     var element = document.getElementById("output");
-        //     element.scrollTop = element.scrollHeight;
-        // }
-
-        // var scroll_interval = setInterval(updateScroll,200);
-        // $( "#output" ).scroll(function(){
-        //     if (scroll_interval != null || scroll_interval != undefined ){
-        //         console.log('Scrolled called. Stopping auto scroll')
-        //         clearInterval(scroll_interval)
-        //     }
-            
-        // })
-            
+        });
 
         $(document).on('click','#stop_process',function(){
-            if(source != undefined || source != null){
+            if(source !== undefined || true){
                 source.close();
                 stream_stopped();
-                source = null;
-                
+
                 // enable the form
                 enable_form()
             }
@@ -263,54 +229,54 @@
 
         // keep an eye on checkboxes
         $('#backfill').change(function() {
-            if($(this).prop("checked") == true){
+            if($(this).prop("checked") === true){
                 $('#clear_prev').prop('checked', false);
             }else{
                 $('#clear_prev').prop('checked', true);
             }
         });
         $('#clear_prev').change(function() {
-            if($(this).prop("checked") == true){
+            if($(this).prop("checked") === true){
                 $('#backfill').prop('checked', false);
             }else{
                 $('#backfill').prop('checked', true);
-            } 
+            }
         });
 
-        // toottip
-        $('[data-toggle="tooltip"]').tooltip(); 
+        // tooltip
+        $('[data-toggle="tooltip"]').tooltip();
 
         // max and min date controls
-        var max_date = new Date();
-        var min_date = new Date(moment(max_date).subtract(365 , 'day'));
-        $('#start_date').datetimepicker({
-            maxDate: max_date,
-            minDate: min_date,
-            icons: {
-                time: 'far fa-clock',
-                date: 'far fa-calendar',
-                today: 'far fa-calendar-check-o',
-                clear: 'far fa-trash',
-                close: 'far fa-times'
-            }
-        });
-        $('#end_date').datetimepicker({
-            maxDate: max_date,
-            minDate: min_date,
-            icons: {
-                time: 'far fa-clock',
-                date: 'far fa-calendar',
-                today: 'far fa-calendar-check-o',
-                clear: 'far fa-trash',
-                close: 'far fa-times'
-            }
-        });
-        $('#end_date').val('')
-        $('#start_date').val('')
-        
+    //     const max_date = new Date();
+    //     const min_date = new Date(moment(max_date).subtract(365 , 'day'));
+    //     $('#start_date').datetimepicker({
+    //         maxDate: max_date,
+    //         minDate: min_date,
+    //         icons: {
+    //             time: 'far fa-clock',
+    //             date: 'far fa-calendar',
+    //             today: 'far fa-calendar-check-o',
+    //             clear: 'far fa-trash',
+    //             close: 'far fa-times'
+    //         }
+    //     });
+    //     $('#end_date').datetimepicker({
+    //         maxDate: max_date,
+    //         minDate: min_date,
+    //         icons: {
+    //             time: 'far fa-clock',
+    //             date: 'far fa-calendar',
+    //             today: 'far fa-calendar-check-o',
+    //             clear: 'far fa-trash',
+    //             close: 'far fa-times'
+    //         }
+    //     });
+    //     $('#end_date').val('')
+    //     $('#start_date').val('')
+    //
     });
 
-    
+
     </script>
 
     <style>
@@ -338,37 +304,46 @@
         }
 
     </style>
-</head>
-<body>
-    <div class="custom-jumbotron jumbotron jumbotron-fluid">
-        <div class="container">
-            <h1><img src="https://airflow.apache.org/_images/pin_large.png" width="40" height="40">
-            Airflow Backfill Utility</h1>      
-            <p>Headache relief for backfill tasks</p>
-        </div>
-    </div>
+    {% endblock %}
+    {% block body %}
+    <h2>Backfill</h2>
+    <br>
 
     <div class="container">
-        
+
         <!-- start form -->
         <form id="form" autocomplete="off">
             <!-- dag related controls -->
             <div class="row">
                 <div class="form-inline">
                     <div class="form-group">
-                        <label for="dag_name">Enter Dag Name:&nbsp;</label>
+                        <label for="dag_name">Enter Dag Name: </label>
                         <input class="form-control mb-2 mr-sm-2" type="text" name="dag_name" id="dag_name" required="true">
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-group" style="position: relative;">
+
+
+            <!-- dag related controls -->
+            <div class="row">
+                <div class="form-inline">
+                    <div class="form-group" style="position:relative">
                         <label for="start_date">Enter Start Date:&nbsp;</label>
-                        <input type="text" name="start_date" class="form-control datetimepicker-input mb-2 mr-sm-2" id="start_date" data-toggle="datetimepicker" data-target="#start_date" required="true"/>
+                        <input type="date" name="start_date" class="form-control mb-2 mr-sm-2" id="start_date" data-target="#start_date" required="true" placeholder="dd/mm/yyy"/>
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-group" style="position: relative;">
-                        <label for="end_date">Enter End Date:&nbsp;</label>
-                        <input type="text" name="end_date" class="form-control datetimepicker-input mb-2 mr-sm-2" id="end_date" data-toggle="datetimepicker" data-target="#end_date" required="true"/>
-                    </div>  
+
+
+            <!-- dag related controls -->
+            <div class="row">
+                <div class="form-inline">
+                    <div class="form-group" style="position:relative">
+                        <label for="end_date">Enter End Date:&nbsp;&nbsp;&nbsp;</label>
+                        <input type="date" name="end_date" class="form-control mb-2 mr-sm-2" id="end_date" data-target="#end_date" required="true" placeholder="dd/mm/yyy"/>
+                    </div>
                 </div>
             </div>
 
@@ -388,7 +363,7 @@
             </div>
 
             <div class="row custom-control custom-switch">
-                <input type="checkbox" name="background" class="custom-control-input mb-2 mr-sm-2" id="background" value="yes">
+                <input type="checkbox" name="background" class="custom-control-input mb-2 mr-sm-2" id="background" value="yes" checked="checked">
                 <label class="custom-control-label" for="background">
                     Run in background <span class="info-icon" data-toggle="tooltip" title="Running in background will use 'screen', a UNIX utility that will run this backfill in seperate terminal session. However you would also get a 'screen' id where your process is running" data-placement="right">&#9432;</span>
                 </label>
@@ -396,7 +371,7 @@
 
             <div class="row">
                 <input id="submit" type="submit" class="btn btn-primary mb-2 mr-sm-2" value="Start">
-                <input type="reset" class="btn btn-light mb-2 mr-sm-2" value="Clear">
+                <input type="reset" class="btn btn-default" value="Clear">
             </div>
         </form>
 
@@ -409,8 +384,8 @@
             <div class="col-md-12">
 
                 <!-- nav tabs-->
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
+                <ul class="nav nav-tabs actions-nav">
+                    <li class="active">
                         <a class="nav-link active" data-toggle="tab" href="#console_output">Realtime Console Output <span class="info-icon" data-toggle="tooltip" title="Newest logs displayed first" data-placement="top">&#9432;</span></a>
                     </li>
                     <li class="nav-item">
@@ -421,7 +396,7 @@
 
                 <!-- Tab panes -->
                 <div class="tab-content">
-                    <div id="console_output" class="container tab-pane active"><br>
+                    <div id="console_output" class="container tab-pane fade"><br>
                         <div id="output">
                             <p>No backfill running</p>
                         </div>
@@ -432,6 +407,6 @@
                   </div>
 
             </div>
-        </tr>
-</body>
-</html>
+        </div>
+    </div>
+{% endblock %}
