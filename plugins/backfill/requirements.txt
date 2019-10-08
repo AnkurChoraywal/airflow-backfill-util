@@ -1,1 +1,1 @@
-shelljob
+shelljob==0.5.6
