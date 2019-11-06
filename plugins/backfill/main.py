@@ -5,6 +5,7 @@ import os
 import json
 import logging
 import datetime
+import re
 
 # Custom Imports
 import flask
@@ -29,6 +30,9 @@ airflow_home_path = os.environ['AIRFLOW_HOME']
 FILE = airflow_home_path + '/logs/backfill_history.txt'
 
 rbac_authentication_enabled = configuration.getboolean("webserver", "RBAC")
+
+# RE for remove ansi escape characters
+ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
 
 # Creating a flask admin BaseView
 def file_ops(mode, data=None):
@@ -81,9 +85,9 @@ class Backfill(get_baseview()):
         clear = request.args.get("clear")
 
         if clear == 'true':
-            cmd = [f"airflow clear -c {str(dag_name)}", f" -s {str(start_date)} -e {str(end_date)}"]
+            cmd = ['airflow', 'clear', '-c', str(dag_name), '-s', str(start_date), '-e', str(end_date)]
         else:
-            cmd = [f"airflow backfill {str(dag_name)}", f" -s {str(start_date)} -e {str(end_date)} -i"]
+            cmd = ['airflow', 'backfill', str(dag_name), '-s', str(start_date), '-e', str(end_date), '-i']
 
         print('BACKFILL CMD:', cmd)
 
@@ -97,9 +101,12 @@ class Backfill(get_baseview()):
             while g.is_pending():
                 lines = g.readlines()
                 for proc, line in lines:
+                    if not isinstance(line, str):
+                        line = line.decode()
+                    line = ansi_escape.sub('', line)
                     print('LINE===> {}'.format(line))
 
-                    yield "data:" + line + "\n\n"
+                    yield "data:" + line + "\n"
 
         return flask.Response(read_process(), mimetype='text/event-stream')
 
