@@ -1,4 +1,12 @@
-{% extends 'admin/master.html' %}
+{% extends 'airflow/master.html' %}
+
+{% block title %}Airflow - Backfill Plugin{% endblock %}
+
+{% block head_css %}
+{{ super() }}
+
+{% endblock %}
+
 {% block tail %}
 
 <script>
@@ -278,6 +286,7 @@
 
 
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 
     <style>
 
@@ -306,6 +315,13 @@
     </style>
     {% endblock %}
     {% block body %}
+    {% if  rbac_authentication_enabled %}
+    {% block navbar %}
+           <header class="top" role="header">
+           {% include 'appbuilder/navbar.html' %}
+           </header>
+    {% endblock %}
+    {%endif%}    
     <h2>Backfill</h2>
     <br>
 
