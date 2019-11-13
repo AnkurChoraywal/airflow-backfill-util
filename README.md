@@ -9,6 +9,10 @@ Backfilling made easy. With UI built with Bootstrap 4, backfilling is just a pie
 ![img](images/admin_backfill_ui.png)
 - History tab shows you jobs so far along with their last runtime ![img](images/admin_backfill_history.png)
 
+## RBAC Support
+
+RBAC support is added in this project, when you change `rbac` in `[webserver]` section, the plugin will auto switch between two mode.
+
 ## Plugin Directory Structure
 ```
 ├── __init__.py
