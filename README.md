@@ -1,6 +1,6 @@
 
 # Airflow Backfill Plugin
-Backfilling made easy. With UI built with Bootstrap 4, backfilling is just a piece of cake. No need to login in your Airflow Environment VM/Setup every time to run command line for backfill and clearing DAG runs. This plugin easily integrates with Airflow webserver and makes your tasks easier by giving you the same control as command line does. This plugin works with Python 3 and Airflow 1.10.3.
+Backfilling made easy. With UI built with Bootstrap 4, backfilling is just a piece of cake. No need to login in your Airflow Environment VM/Setup every time to run command line for backfill and clearing DAG runs. This plugin easily integrates with Airflow webserver and makes your tasks easier by giving you the same control as command line does. This plugin works with Python 3 and Airflow 1.10.3. Now supports RBAC as well.
 
 ## How to Use 
 - Plugin is easily navigable from "Admin" menu link
