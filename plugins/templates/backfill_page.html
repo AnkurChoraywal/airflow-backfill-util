@@ -110,7 +110,7 @@
 
 
 			if (background === false) {
-				url = '/admin/backfill/stream' + query_string;
+				url = window.location.toString().split("/admin/backfill")[0] + '/admin/backfill/stream' + query_string;
 
 				document.getElementById("output").innerHTML = '';
 
@@ -161,7 +161,7 @@
 				user_accepted = confirm("You have selected background backfill for DAG name '" + dag_name + "'. Please click OK if DAG name is correct.");
 
 				if (user_accepted === true) {
-					url = '/admin/backfill/background' + query_string;
+					url = window.location.toString().split("/admin/backfill")[0] + '/admin/backfill/background' + query_string;
 
 					// show background progress message
 					background_progress();
@@ -187,7 +187,7 @@
 		$("#history_load").click(function () {
 			$("#history").html('Fetching history...');
 
-			$.get('/admin/backfill/history', function (data) {
+			$.get(window.location.toString().split("/admin/backfill")[0] + '/admin/backfill/history', function (data) {
 
 				if (data != null) {
 					let data_rows = data.split('\n');
