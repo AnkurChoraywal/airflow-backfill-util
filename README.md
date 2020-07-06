@@ -37,5 +37,3 @@ RBAC support is added in this project, when you change `rbac` in `[webserver]` s
 5. All done ! Just restart your `webserver` and you are good to go.
 
 Feels Awesome ! Start contributing.
-
-Author - ankur.choryawal@news.co.uk
