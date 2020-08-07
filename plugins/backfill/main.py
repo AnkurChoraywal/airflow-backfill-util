@@ -87,7 +87,7 @@ class Backfill(get_baseview()):
         if clear == 'true':
             cmd = ['airflow', 'clear', '-c', str(dag_name), '-s', str(start_date), '-e', str(end_date)]
         else:
-            cmd = ['airflow', 'backfill', str(dag_name), '-s', str(start_date), '-e', str(end_date), '-i']
+            cmd = ['airflow', 'backfill', str(dag_name), '-s', str(start_date), '-e', str(end_date)]
 
         print('BACKFILL CMD:', cmd)
 
@@ -126,7 +126,7 @@ class Backfill(get_baseview()):
             # Prepare the command and execute in background
             background_cmd = f"screen -dmS {screen_id} airflow clear -c {dag_name} -s {start_date} -e {end_date}"
         else:
-            background_cmd = f"screen -dmS {screen_id} airflow backfill {dag_name} -s {start_date} -e {end_date} -i"
+            background_cmd = f"screen -dmS {screen_id} airflow backfill {dag_name} -s {start_date} -e {end_date}"
 
         # Update command in file
         file_ops('w', background_cmd)
